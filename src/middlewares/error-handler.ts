@@ -9,14 +9,16 @@ export function errorHandler(
   _: NextFunction
 ) {
   if (error instanceof AppError) {
-    return response.status(error.statusCode).json({ message: error.message });
+    response.status(error.statusCode).json({ message: error.message });
+    return;
   }
 
   if (error instanceof ZodError) {
-    return response
+    response
       .status(400)
       .json({ message: 'Validation error', field: error.format() });
+    return;
   }
 
-  return response.status(500).json({ message: error.message });
+  response.status(500).json({ message: error.message });
 }
