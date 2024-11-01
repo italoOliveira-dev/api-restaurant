@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "knex": "node --no-warning --import tsx ./node_module/.bin/knex"
+    "knex": "node --no-warnings --import tsx ./node_modules/.bin/knex"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
