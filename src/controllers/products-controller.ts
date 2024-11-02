@@ -95,4 +95,29 @@ export class ProductsController {
       next(error);
     }
   }
+
+  async remove(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = z
+        .string()
+        .transform((value) => Number(value))
+        // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+        .refine((value) => !isNaN(value), { message: 'id inválido' })
+        .parse(request.params.id);
+
+      const product = await knex<ProductRepository>('products')
+        .select()
+        .where({ id })
+        .first();
+
+      if (!product) {
+        throw new AppError('Product not found', 404);
+      }
+
+      await knex<ProductRepository>('products').delete().where({ id });
+      response.status(204).json();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
