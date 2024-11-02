@@ -26,4 +26,17 @@ export class ProductsController {
       next(error);
     }
   }
+
+  async index(request: Request, response: Response, next: NextFunction) {
+    try {
+      const { name } = request.query;
+
+      const product = await knex<ProductRepository>('products')
+        .select('id', 'name', 'price')
+        .whereLike('name', `%${name ?? ''}%`);
+      response.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
