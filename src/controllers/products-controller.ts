@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { knex } from '../database/setup-knex';
+import { AppError } from '../utils/app-error';
 
 export class ProductsController {
   async create(request: Request, response: Response, next: NextFunction) {
@@ -35,6 +36,24 @@ export class ProductsController {
         .select('id', 'name', 'price')
         .whereLike('name', `%${name ?? ''}%`);
       response.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async show(request: Request, response: Response, next: NextFunction) {
+    try {
+      const { id } = request.params;
+
+      const [product] = await knex('products')
+        .select('id', 'name', 'price')
+        .where({ id });
+
+      if (!product) {
+        throw new AppError('Product not found', 404);
+      }
+
+      response.json(product);
     } catch (error) {
       next(error);
     }
