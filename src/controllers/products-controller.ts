@@ -58,4 +58,32 @@ export class ProductsController {
       next(error);
     }
   }
+
+  async update(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = z
+        .string()
+        .transform((values) => Number(values))
+        // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+        .refine((value) => !isNaN(value), { message: 'id inválido"' })
+        .parse(request.params.id);
+
+      const bodySchema = z.object({
+        name: z.string({ message: 'Name é obrigatório!' }).trim(),
+        price: z
+          .number({ message: 'Price é obrigatório!' })
+          .gt(0, { message: 'Price tem que ser positivo!' }),
+      });
+
+      const { name, price } = bodySchema.parse(request.body);
+
+      const product = await knex<ProductRepository>('products')
+        .update({ name, price, updated_at: knex.fn.now() })
+        .where({ id });
+
+      response.json();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
